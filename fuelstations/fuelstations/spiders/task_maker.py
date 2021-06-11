@@ -41,7 +41,6 @@ class TaskMakerSpider(scrapy.Spider):
     }
 
     def __init__(self, **kwargs):
-        # super().__init__(**kwargs)
         fstation_type = kwargs.get("fstation_type", None)
         if not fstation_type:
             raise NotConfigured("fstation_type parameter has needed to be set.")

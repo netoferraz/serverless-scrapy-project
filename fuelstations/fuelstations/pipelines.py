@@ -87,4 +87,4 @@ class BQIngestor:
             spider.logger.error(
                 "Encountered errors while inserting rows: {}".format(errors)
             )
-            print(payload)
+            spider.logger.error(payload)
