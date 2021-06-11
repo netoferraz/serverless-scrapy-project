@@ -2,4 +2,5 @@
 #
 # Please refer to the documentation for information on how to create and manage
 # your spiders.
-from fuelstations.spiders.postos import PostosSpider
+from fuelstations.spiders.details import FacilityDetailsSpider
+from fuelstations.spiders.task_maker import TaskMakerSpider

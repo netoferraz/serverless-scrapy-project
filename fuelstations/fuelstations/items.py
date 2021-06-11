@@ -5,6 +5,7 @@
 
 import scrapy
 
+
 class FacilityDetails(scrapy.Item):
     autorizacao = scrapy.Field()
     cnpj = scrapy.Field()
@@ -25,3 +26,8 @@ class FacilityDetails(scrapy.Item):
     socios = scrapy.Field()
     equipamentos = scrapy.Field()
     datetime_collected = scrapy.Field()
+
+
+class FacilityCodes(scrapy.Item):
+    codes = scrapy.Field()
+    uf = scrapy.Field()
