@@ -16,7 +16,7 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
     GCP_PROJECT_ID=postos-anp\
     GCP_CREDENTIALS_BQ=./fuelstations/credentials/credentials.json\
     GCP_CREDENTIALS_PUBSUB=./fuelstations/credentials/pubsub_credentials.json\
-    GCP_BQ_TABLE=postos_anp.staging_postos_anp
+    GCP_BQ_TABLE=postos_anp.staging_postos_anp\
     GCP_PUBSUB_TOPIC_ID=fuel-station-data
 RUN adduser --system -u ${LOCAL_USER_ID:-1000} crawler && \
     apt-get update && \

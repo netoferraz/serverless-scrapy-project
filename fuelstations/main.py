@@ -6,6 +6,16 @@ import scrapy.crawler as crawler
 from scrapy.utils.log import configure_logging
 from fuelstations.spiders import FacilityDetailsSpider, TaskMakerSpider
 from multiprocessing import Process, Queue
+from pydantic import BaseModel
+from typing import Dict
+import json
+import base64
+
+
+class PubSubMessage(BaseModel):
+    message: Dict
+    subscription: str
+
 
 app = FastAPI()
 
@@ -97,12 +107,15 @@ def gen_task(fstation_type: str, uf: str):
 
 
 @app.post("/details")
-def collect_details(request: Request):
-    params = request.json()
-    codes = params.get("codes", None)
+def collect_details(data: PubSubMessage):
+    message = data.message
+    # base64
+    b64payload = message.get("data")
+    payload = json.loads(base64.b64decode(b64payload).decode("utf-8"))
+    codes = payload.get("codes")
+    uf = payload.get("uf")
     if not codes:
         raise HTTPException(status_code=404, detail="codes not found.")
-    uf = params.get("uf", None)
     if not uf:
         raise HTTPException(status_code=404, detail="uf not found.")
     run_spider(FacilityDetailsSpider, **{"codes": codes, "uf": uf})

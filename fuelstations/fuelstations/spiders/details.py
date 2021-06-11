@@ -31,7 +31,6 @@ class FacilityDetailsSpider(scrapy.Spider):
     }
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
         codes = kwargs.get("codes", None)
         if not codes:
             raise NotConfigured("codes parameter has needed to be set.")
