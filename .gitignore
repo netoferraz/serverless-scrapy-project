@@ -141,4 +141,5 @@ cython_debug/
 .vscode
 
 #credentials
-/postosanp/postosanp/credentials/credentials.json
+/fuelstations/fuelstations/credentials/credentials.json
+/fuelstations/fuelstations/credentials/pubsub_credentials.json

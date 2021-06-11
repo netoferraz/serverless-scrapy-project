@@ -7,10 +7,11 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
-BOT_NAME = 'fuelstations'
 
-SPIDER_MODULES = ['fuelstations.spiders']
-NEWSPIDER_MODULE = 'fuelstations.spiders'
+BOT_NAME = "fuelstations"
+
+SPIDER_MODULES = ["fuelstations.spiders"]
+NEWSPIDER_MODULE = "fuelstations.spiders"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -22,7 +23,7 @@ COOKIES_ENABLED = True
 DEFAULT_REQUEST_HEADERS = {
     "Connection": "keep-alive",
     "Cache-Control": "max-age=0",
-    "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
+    "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
     "sec-ch-ua-mobile": "?0",
     "Upgrade-Insecure-Requests": "1",
     "Origin": "https://postos.anp.gov.br",
@@ -34,16 +35,19 @@ DEFAULT_REQUEST_HEADERS = {
     "Sec-Fetch-User": "?1",
     "Sec-Fetch-Dest": "document",
     "Referer": "https://postos.anp.gov.br/",
-    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
+    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
+LOG_LEVEL = "INFO"
+LOG_ENABLED = True
 
-ITEM_PIPELINES = {
-    'postosanp.pipelines.BQIngestor': 200,
-}
-
-LOG_LEVEL = 'INFO'
-LOG_ENABLED =  True
-
-BQ_TABLE = os.environ.get("GCP_BQ_TABLE", 'postos_anp.staging_postos_anp')
-GCP_PROJECT_ID = os.environ.get("GCP_PROJECT_ID", 'postos-anp')
+# GCP
+BQ_TABLE = os.environ.get("GCP_BQ_TABLE", "postos_anp.staging_postos_anp")
+GCP_PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "postos-anp")
+PUBSUB_TOPIC_ID = os.environ.get("GCP_PUBSUB_TOPIC_ID", "fuel-station-data")
+GCP_CREDENTIALS_PUBSUB = os.environ.get(
+    "GCP_CREDENTIALS_PUBSUB", "./fuelstations/credentials/pubsub_credentials.json"
+)
+GCP_CREDENTIALS_BQ = os.environ.get(
+    "GCP_CREDENTIALS_BQ", "./fuelstations/credentials/credentials.json"
+)
