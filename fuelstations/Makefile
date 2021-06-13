@@ -1,5 +1,5 @@
 APPNAME   = postos_anp_crawler
-VERSION   = 0.5.2
+VERSION   = 0.5.3
 PROJECT   = postos-anp
 
 publish:
@@ -13,4 +13,5 @@ git-release:
 	git add .
 	git commit -m "v$(VERSION)"
 	git tag v$(VERSION)
-	git push origin v$(VERSION)
+	git push
+	git push --tags
