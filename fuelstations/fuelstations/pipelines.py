@@ -1,10 +1,3 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-
-# useful for handling different item types with a single interface
 import os
 from pathlib import Path
 import sys
@@ -16,13 +9,17 @@ import json
 
 class PubSubPublisher:
     def __init__(self, project_name, topic_id, credentials_path) -> None:
-        credentials_file = Path(credentials_path)
-        if not credentials_file.is_file():
-            print("File credentials for PubSub not found.")
-            sys.exit(1)
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(credentials_file)
-        self.project_name = project_name
-        self.topic_id = topic_id
+        try:
+            credentials_file = Path(credentials_path)
+        except TypeError:
+            credentials_file = os.environ.get("GCP_CREDENTIALS_PUBSUB")
+        else:
+            if not credentials_file.is_file():
+                print("File credentials for PubSub not found.")
+                sys.exit(1)
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(credentials_file)
+            self.project_name = project_name
+            self.topic_id = topic_id
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -41,20 +38,12 @@ class PubSubPublisher:
         payload = json.dumps(payload).encode("utf-8")
         future = self.publisher.publish(self.topic_path, payload, origin="task_maker")
         _id = future.result()
-        spider.logger.info(f"Message {_id} has sent for topic. {self.topic_id}.")
+        spider.logger.info(f"Message {_id} has sent for topic {self.topic_id}.")
 
 
 class BQIngestor:
-    def __init__(
-        self,
-        project_name,
-        bq_table,
-    ):
-        credentials_file = Path(
-            os.environ.get(
-                "GCP_CREDENTIALS_BQ", "./fuelstations/credentials/credentials.json"
-            )
-        )
+    def __init__(self, project_name, bq_table, credentials_path):
+        credentials_file = Path(credentials_path)
         if not credentials_file.is_file():
             print("File credentials not found.")
             sys.exit(1)
@@ -80,7 +69,7 @@ class BQIngestor:
             self.bq_table, payload, row_ids=[None] * len(payload)
         )
         if errors == []:
-            spider.logger.debug(
+            spider.logger.info(
                 f"We've scraped sucessly data for fuel station {item.get('cnpj')}."
             )
         else:

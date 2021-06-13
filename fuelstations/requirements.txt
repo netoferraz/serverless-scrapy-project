@@ -9,6 +9,7 @@ cffi==1.14.5
 chardet==4.0.0
 click==8.0.1
 constantly==15.1.0
+crochet==2.0.0
 cryptography==3.4.7
 cssselect==1.1.0
 dateparser==1.0.0
@@ -77,5 +78,6 @@ uvloop==0.15.2
 w3lib==1.22.0
 watchgod==0.7
 websockets==9.1
+wrapt==1.12.1
 zipp==3.4.1
 zope.interface==5.4.0
