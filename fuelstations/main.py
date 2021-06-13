@@ -1,15 +1,16 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, HTTPException
 from scrapy.utils.project import get_project_settings
 import os
-from twisted.internet import reactor
 import scrapy.crawler as crawler
 from scrapy.utils.log import configure_logging
 from fuelstations.spiders import FacilityDetailsSpider, TaskMakerSpider
-from multiprocessing import Process, Queue
 from pydantic import BaseModel
 from typing import Dict
 import json
 import base64
+import crochet
+
+crochet.setup()
 
 
 class PubSubMessage(BaseModel):
@@ -20,33 +21,7 @@ class PubSubMessage(BaseModel):
 app = FastAPI()
 
 
-def run_configuration(queue, spider, **kwargs):
-    try:
-        settings = get_project_settings()
-        settings_module_path = os.environ.get("SCRAPY_ENV", "fuelstations.settings")
-        settings.setmodule(settings_module_path)
-        configure_logging(settings)
-        runner = crawler.CrawlerRunner(settings)
-        print(kwargs)
-        deferred = runner.crawl(spider, **kwargs)
-        deferred.addBoth(lambda _: reactor.stop())
-        reactor.run()
-        queue.put(None)
-    except Exception as e:
-        queue.put(e)
-
-
-def run_spider(spider, **kwargs):
-    q = Queue()
-    p = Process(target=run_configuration, args=(q, spider), kwargs=kwargs)
-    p.start()
-    result = q.get()
-    p.join()
-
-    if result is not None:
-        raise result
-
-
+@crochet.run_in_reactor
 @app.post("/taskmaker")
 def gen_task(fstation_type: str, uf: str):
     """[summary]
@@ -102,10 +77,16 @@ def gen_task(fstation_type: str, uf: str):
         raise HTTPException(
             status_code=404, detail=f"{fstation_type} isn't a valid fstation_type."
         )
-    run_spider(TaskMakerSpider, **{"fstation_type": fstation_type, "uf": uf})
-    return {"status": "OK"}
+    settings = get_project_settings()
+    settings_module_path = os.environ.get("SCRAPY_ENV", "fuelstations.settings")
+    settings.setmodule(settings_module_path)
+    configure_logging(settings)
+    runner = crawler.CrawlerRunner(settings)
+    _ = runner.crawl(TaskMakerSpider, **{"fstation_type": fstation_type, "uf": uf})
+    return {"status": "TaskMakerSpider has started."}
 
 
+@crochet.run_in_reactor
 @app.post("/details")
 def collect_details(data: PubSubMessage):
     message = data.message
@@ -118,5 +99,10 @@ def collect_details(data: PubSubMessage):
         raise HTTPException(status_code=404, detail="codes not found.")
     if not uf:
         raise HTTPException(status_code=404, detail="uf not found.")
-    run_spider(FacilityDetailsSpider, **{"codes": codes, "uf": uf})
-    return {"status": "OK"}
+    settings = get_project_settings()
+    settings_module_path = os.environ.get("SCRAPY_ENV", "fuelstations.settings")
+    settings.setmodule(settings_module_path)
+    configure_logging(settings)
+    runner = crawler.CrawlerRunner(settings)
+    _ = runner.crawl(FacilityDetailsSpider, **{"codes": codes, "uf": uf})
+    return {"status": "FacilityDetailsSpider has started."}

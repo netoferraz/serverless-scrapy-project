@@ -43,15 +43,19 @@ class FacilityDetailsSpider(scrapy.Spider):
         if not uf:
             raise NotConfigured("uf parameter has needed to be set.")
         self.uf = uf
+        self.logger.info(
+            f"{self.__class__.name} has started with: {self.codes} and {self.uf}."
+        )
 
     def start_requests(self):
         for code in self.codes:
+            # self.logger.info(f"Preparing POST request for {code}.")
             yield FormRequest(
                 "https://postos.anp.gov.br/resultado.asp",
                 method="POST",
                 formdata={"Cod_Inst": code, "estado": self.uf, "municipio": "0"},
                 dont_filter=True,
-                callback=self.parse_posto_details,
+                callback=self.parse,
                 cb_kwargs={"cod_inst": code},
             )
 
@@ -61,7 +65,7 @@ class FacilityDetailsSpider(scrapy.Spider):
         text = text.strip()
         return text
 
-    def parse_posto_details(self, response, cod_inst):
+    def parse(self, response, cod_inst):
         self.logger.info(
             f"[{self.uf}] Collecting data from fuel station with installation code number {cod_inst}."
         )
