@@ -50,8 +50,8 @@ class TaskMakerSpider(scrapy.Spider):
         if not uf:
             raise NotConfigured("uf parameter has needed to be set.")
         self.uf = uf
-        self.logger.debug(
-            f"Crawler has started with: {self.fstation_type} and {self.uf}."
+        self.logger.info(
+            f"{self.__class__.name} has started with: {self.fstation_type} and {self.uf}."
         )
 
     def start_requests(self):
