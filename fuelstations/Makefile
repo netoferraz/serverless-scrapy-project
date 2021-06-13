@@ -1,5 +1,5 @@
 APPNAME   = postos_anp_crawler
-VERSION   = 0.5.1
+VERSION   = 0.5.2
 PROJECT   = postos-anp
 
 publish:
@@ -9,6 +9,8 @@ publish:
 	docker push gcr.io/${PROJECT}/${APPNAME}:${VERSION}
 
 
-git-tag:
-	@git tag v$(VERSION) &&\ 
+git-release:
+	git add .
+	git commit -m "v$(VERSION)"
+	git tag v$(VERSION)
 	git push origin v$(VERSION)
