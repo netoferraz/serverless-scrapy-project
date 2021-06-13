@@ -43,7 +43,10 @@ class PubSubPublisher:
 
 class BQIngestor:
     def __init__(self, project_name, bq_table, credentials_path):
-        credentials_file = Path(credentials_path)
+        try:
+            credentials_file = Path(credentials_path)
+        except TypeError:
+            credentials_file = os.environ.get("GCP_CREDENTIALS_BQ")
         if not credentials_file.is_file():
             print("File credentials not found.")
             sys.exit(1)
