@@ -1,5 +1,5 @@
 APPNAME   = postos_anp_crawler
-VERSION   = 0.5
+VERSION   = 0.5.1
 PROJECT   = postos-anp
 
 publish:
